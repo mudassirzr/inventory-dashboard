@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { editProduct } from "../../state/features/products/productsSlice";
 import { useAppDispatch, useAppSelector } from "../../state/hooks";
-import { Product, ProductState } from "../../state/types/product";
+import { ProductState } from "../../state/types/product";
 
 interface InventoryEditModelProps {
   productId: number;

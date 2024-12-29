@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import {
-  editProduct,
   disableProduct,
   deleteProduct,
 } from "../../state/features/products/productsSlice";
