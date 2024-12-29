@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import Loader from "./components/ui/Loader";
+import { FETCH_PRODUCTS_URL } from "./constants";
+import { Product, ProductResponse } from "./state/types/product";
+import { useAppDispatch } from "./state/hooks";
+import { addProducts } from "./state/features/products/productsSlice";
+import Container from "./components/modules/Container";
+import InventoryStats from "./components/ui/InvetoryStats";
+import InventoryList from "./components/ui/InventoryList";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const getProducts = async () => {
+      setLoading(true);
+      const response = await fetch(FETCH_PRODUCTS_URL);
+      const data: ProductResponse[] = await response.json();
+      const productStore: Product[] = [];
+      data.forEach((item: ProductResponse, i) => {
+        productStore.push({
+          id: i,
+          name: item.name,
+          category: item.category,
+          price: parseFloat(item.price.substring(1, item.price.length)),
+          quantity: item.quantity,
+          currency: item.price[0],
+        });
+      });
+      dispatch(addProducts(productStore));
+      setLoading(false);
+    };
+    getProducts();
+  }, [dispatch]);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <main>
+      <Container>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div>
+            <h1 className="text-4xl font-light">Inventory Stats</h1>
+            <InventoryStats />
+            <InventoryList />
+          </div>
+        )}
+      </Container>
+    </main>
+  );
 }
 
-export default App
+export default App;
